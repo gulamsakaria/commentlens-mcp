@@ -30,3 +30,24 @@ By default it calls https://commentlens-api.onrender.com. Set COMMENTLENS_API_UR
 ## Permissions
 
 The server only sends the comment or claim text you pass in to the CommentLens API. It reads no files, stores nothing and needs no credentials.
+
+## Second server: YouTube comments (youtube_server.py)
+
+Pulls the comments of a public YouTube video and analyses them with the hosted CommentLens API, so a whole comment section can be checked from a chat or coding session.
+
+| Tool | What it does |
+|---|---|
+| fetch_youtube_comments | Top-level comments of a public video (most relevant first), up to 300. |
+| analyze_youtube_video | Fetches the comments, classifies each one, and returns class counts, opinion share, the Comment Health Score and up to 5 distinct claim comments checked against the news archive. |
+
+It needs a YouTube Data API v3 key in the YOUTUBE_API_KEY environment variable of the server process. The key is sent in a request header and is never returned by a tool. Claims are only reported as backed or not backed by news, never as true or false.
+
+Run it with: python youtube_server.py
+
+Register it with Claude Code: claude mcp add commentlens-youtube -- python /path/to/youtube_server.py
+
+## How it was checked
+
+- Both servers connect to Claude Code (claude mcp list reports them as connected).
+- The main server was called through a Python MCP stdio client against the live API.
+- The YouTube server was tested with the YouTube API mocked and the live CommentLens API, covering link parsing, the API key staying in the header, claim checking and the missing-key error. It has not been run against the real YouTube API yet.
